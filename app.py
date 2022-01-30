@@ -1,5 +1,5 @@
 """Flask app for Cupcakes"""
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 from models import db, connect_db, Cupcake, serialize_cupcake
 
 
@@ -13,7 +13,7 @@ app.config["SQLALCHEMY_ECHO"] = True
 
 connect_db(app)
 
-
+# -----------------------API Routes -----------------------------
 @app.route("/api/cupcakes")
 def get_cupcakes():
     """Gets all cupcake data"""
@@ -41,7 +41,10 @@ def add_cupcake():
     flavor = request.json["flavor"]
     size = request.json["size"]
     rating = request.json["rating"]
-    image = request.json["image"]
+    if request.json["image"] == '':
+        image = "https://tinyurl.com/demo-cupcake"
+    else:
+        image = request.json["image"]
 
     cupcake = Cupcake(flavor=flavor, size=size, rating=rating, image=image)
 
@@ -79,3 +82,12 @@ def delete_cupcake(cupcake_id):
     db.session.delete(cupcake)
 
     return jsonify(message="Deleted")
+
+# ------------------End of API Routes----------------------------------------
+
+# --------------------Web Page Routes----------------------------------------
+@app.route("/")
+def home_page():
+    """Shows Homepage"""
+
+    return render_template("home_page.html")
